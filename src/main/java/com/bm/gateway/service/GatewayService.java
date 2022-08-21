@@ -9,9 +9,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class GatewayService {
+
+    private static final String IPV4_REGEX = "^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\\.(?!$)|$)){4}$";
+    private static final Pattern pattern = Pattern.compile(IPV4_REGEX);
+
+    protected static final int MAX_DEVICE = 10;
 
     @Autowired
     private GatewayRepository gatewayRepository;
@@ -23,8 +30,12 @@ public class GatewayService {
         return gatewayRepository.findAll();
     }
 
+    public boolean isValid(final String gatewayIpv4){
+        return pattern.matcher(gatewayIpv4).matches();
+    }
+
     public Gateway addGateway(Gateway gateway){
-        //TODO: validate IP before adding
+        gateway.setValid(isValid(gateway.getIpv4()));
         return gatewayRepository.save(gateway);
     }
 
@@ -42,6 +53,11 @@ public class GatewayService {
         Device device;
         if (deviceOpt.isPresent()) device = deviceOpt.get();
         else return Optional.empty();
+
+        if (gateway.getDevices().size() >= MAX_DEVICE){
+            return Optional.empty();
+        }
+
         gateway.getDevices().add(device);
         gatewayRepository.save(gateway);
         return gatewayOpt;
