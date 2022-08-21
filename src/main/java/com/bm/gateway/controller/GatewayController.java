@@ -28,4 +28,14 @@ public class GatewayController {
     public Optional<Gateway> getGatewayById(@PathVariable String id){
         return gatewayService.getGatewayById(id);
     }
+
+    @PutMapping("/add/device/{gatewayId}/{deviceId}")
+    public Optional<Gateway> addDeviceToGateway(@PathVariable String gatewayId, @PathVariable Long deviceId){
+        return gatewayService.addDeviceToGateway(gatewayId, deviceId);
+    }
+
+    @DeleteMapping("/remove/device/{gatewayId}/{deviceId}")
+    public Optional<Gateway> removeDeviceFromGateway(@PathVariable String gatewayId, @PathVariable Long deviceId){
+        return gatewayService.removeDeviceFromGateway(gatewayId, deviceId);
+    }
 }
